@@ -1,0 +1,117 @@
+<h2>Add Flight</h2>
+
+<div>
+	<form role="form-inline">
+		<div class="form-group">
+			<label for="flightNo">Flight No:</label>
+			<div class="input-group">
+				<input type="text" class="form-control" id="flightNo"
+					ng-model="flight.flightNo"> <span class="input-group-btn">
+					<button type="button" class="btn btn-default"
+						ng-click="autocomplete('flightNo')">
+						<i class="fa fa-magic"></i>
+					</button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="departure">Departure:</label>
+			<div class="input-group">
+				<input type="text" class="form-control"
+					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.departure"
+					is-open="cal_open_departure" /> <span class="input-group-btn">
+					<button type="button" class="btn btn-default"
+						ng-click="openCalendar($event, 'departure')">
+						<i class="fa fa-calendar"></i>
+					</button>
+				</span>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="arrival">Arrival:</label>
+			<div class="input-group">
+				<input type="text" class="form-control"
+					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.arrival"
+					is-open="cal_open_arrival" /> <span class="input-group-btn">
+					<button type="button" class="btn btn-default"
+						ng-click="openCalendar($event, 'arrival')">
+						<i class="fa fa-calendar"></i>
+					</button>
+				</span>
+			</div>
+
+		</div>
+		<div class="form-group">
+			<label for="from">From:</label> <input type="text"
+				class="form-control" id="from" ng-model="flight.from">
+			{{flight.aptFrom.name}} - {{flight.aptFrom.openflightsId}}
+		</div>
+		<div class="form-group">
+			<label for="to">To:</label> <input type="text" class="form-control"
+				id="to" ng-model="flight.to"> {{flight.aptTo.name}} - {{flight.aptTo.openflightsId}}
+		</div>
+
+		<div class="form-group">
+			<label for="seat">Seat:</label> <input type="text"
+				class="form-control" id="seat" ng-model="flight.seat">
+		</div>
+		<div class="form-group">
+			<label for="seatType">Seat Type:</label>
+			<div>
+				<div class="btn-group">
+					<label class="btn btn-primary" ng-model="flight.seatType"
+						uib-btn-radio="'A'">Aisle</label> <label class="btn btn-primary"
+						ng-model="flight.seatType" uib-btn-radio="'M'">Middle</label> <label
+						class="btn btn-primary" ng-model="flight.seatType"
+						uib-btn-radio="'W'">Window</label>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="class">Class:</label>
+			<div>
+				<div class="btn-group">
+					<label class="btn btn-primary" ng-model="flight.bookingClass"
+						uib-btn-radio="'Y'">Economy</label> <label class="btn btn-primary"
+						ng-model="flight.bookingClass" uib-btn-radio="'M'">Premium
+						Eco</label> <label class="btn btn-primary" ng-model="flight.bookingClass"
+						uib-btn-radio="'C'">Business</label> <label
+						class="btn btn-primary" ng-model="flight.bookingClass"
+						uib-btn-radio="'F'">First</label>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="reason">Reason:</label> 
+			<div class="btn-group">
+					<label class="btn btn-primary" ng-model="flight.reason"
+						uib-btn-radio="'B'">Work</label> <label class="btn btn-primary"
+						ng-model="flight.reason" uib-btn-radio="'L'">Leisure
+						</label> <label class="btn btn-primary" ng-model="flight.reason"
+						uib-btn-radio="'C'">Crew</label> <label
+						class="btn btn-primary" ng-model="flight.reason"
+						uib-btn-radio="'O'">Other</label>
+				</div>
+			
+			<input type="text"
+				class="form-control" id="reason" ng-model="flight.reason">
+		</div>
+		<div class="form-group">
+			<label for="carrier">Carrier:</label> <input type="text"
+				class="form-control" id="carrier" ng-model="flight.carrier.name">{{flight.carrier.openflightsId}}
+		</div>
+		<div class="form-group">
+			<label for="acType">Aircraft Type:</label> <input type="text"
+				class="form-control" id="acType" ng-model="flight.acType">
+			{{aircraft.name}}
+		</div>
+		<div class="form-group">
+			<label for="acTailsign">Aircract Tailsign:</label> <input type="text"
+				class="form-control" id="acTailsign" ng-model="flight.acTailsign">
+		</div>
+		<button ng-click="save()" class="btn btn-default">Submit</button>
+	</form>
+
+</div>
+<img
+	ng-src="http://www.gcmap.com/map?P={{flight.from}}-{{flight.to}}&MS=bm&MR=540&MX=720x360&PM=*" />
