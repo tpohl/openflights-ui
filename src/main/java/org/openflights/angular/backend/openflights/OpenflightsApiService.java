@@ -1,8 +1,8 @@
 package org.openflights.angular.backend.openflights;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -13,18 +13,20 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.openflights.angular.backend.Calculation;
 import org.openflights.angular.model.Airline;
 import org.openflights.angular.model.Airport;
+import org.openflights.angular.model.Credentials;
 import org.openflights.angular.model.Flight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 @Named
-public class OpenflightsApiService {
+public class OpenflightsApiService implements Serializable {
 	private static final Logger LOG = LoggerFactory.getLogger(OpenflightsApiService.class);
 	@Inject
 	Calculation calculation;
@@ -81,7 +83,22 @@ public class OpenflightsApiService {
 		return al;
 	}
 
-	public boolean persistFlight(Flight flight) {
+	public String login(Credentials cred) {
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/submit.php"));
+
+		Form form = new Form();
+		form.param("name", cred.getUsername());
+		form.param("pw", cred.getPasswordHash());
+		form.param("lpw", cred.getPasswordHash());
+		form.param("challenge", cred.getChallenge());
+		Response response = target.request(MediaType.APPLICATION_XML)
+				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+		return response.getCookies().get("PHPSESSID").getValue();
+		
+	}
+
+	public boolean persistFlight(Flight flight, String sessionId) {
 		LOG.info("Persisting Flight {}", flight);
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/submit.php"));
@@ -116,7 +133,7 @@ public class OpenflightsApiService {
 		// TODO What is this
 		form.param("fid", "4824043");// fid:4824043
 		form.param("param", "ADD");// param:ADD
-		String sessionId = ""; // TODO how to get this.
+		LOG.info("Using Session ID {}", sessionId);
 		String response = target.request(MediaType.APPLICATION_XML).cookie("PHPSESSID", sessionId)
 				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE), String.class);
 		LOG.info("Response of persisting Flight {}", response);

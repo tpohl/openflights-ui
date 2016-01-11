@@ -2,6 +2,7 @@ package org.openflights.angular.rest;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -19,10 +20,10 @@ public class FlightsEndpoint {
 	OpenflightsApiService openflightsApiService;
 
 	@POST
-	public boolean saveFlight(final Flight flight) {
+	public boolean saveFlight(final Flight flight, @HeaderParam("openflightssessionid") String sessionId) {
 
-		LOG.info("Flight to be saved {}", flight);
-		return openflightsApiService.persistFlight(flight);
+		LOG.info("Flight to be saved {} with session {}", flight, sessionId);
+		return openflightsApiService.persistFlight(flight,sessionId);
 	}
 
 	@GET

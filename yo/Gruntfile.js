@@ -263,14 +263,19 @@ module.exports = function (grunt) {
         assetsDirs: [
           '<%= yeoman.dist %>',
           '<%= yeoman.dist %>/images',
-          '<%= yeoman.dist %>/styles'
+          '<%= yeoman.dist %>/styles',
+          '<%= yeoman.dist %>/fonts'
         ],
         patterns: {
           js: [[/(images\/[^''""]*\.(png|jpg|jpeg|gif|webp|svg))/g, 'Replacing references to images']]
         }
       }
     },
-
+    cssmin: {
+    	   options: {
+    	     rebase: false
+    	   }
+    },
     // The following *-min tasks will produce minified files in the dist folder
     // By default, your `index.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
@@ -388,7 +393,26 @@ module.exports = function (grunt) {
           cwd: '.tmp/images',
           dest: '<%= yeoman.dist %>/images',
           src: ['generated/*']
-        }]
+        },
+        {
+            expand : true,
+            dot : true,
+            cwd : '<%= yeoman.app %>/../bower_components/bootstrap-css-only',
+            dest : '<%= yeoman.dist %>/styles/bower_components/bootstrap-css-only',
+            src : [
+                'fonts/*.*'
+            ]
+        },
+        {
+            expand : true,
+            dot : true,
+            cwd : '<%= yeoman.app %>/../bower_components/components-font-awesome',
+            dest : '<%= yeoman.dist %>/styles/bower_components/components-font-awesome',
+            src : [
+                'fonts/*.*'
+            ]
+        }
+        ]
       },
       styles: {
         expand: true,

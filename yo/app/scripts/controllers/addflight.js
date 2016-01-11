@@ -9,13 +9,31 @@ angular.module('openflightsApp').controller(
 		'AddflightCtrl',
 		[
 				'$scope',
+				'$rootScope',
 				'BACKEND_URL',
 				'$resource',
 				'$http',
-				function($scope, BACKEND_URL, $resource, $http) {
-					var flights = $resource(BACKEND_URL + "/flight");
+				function($scope,$rootScope, BACKEND_URL, $resource, $http) {
+					var flights = $resource(BACKEND_URL + "/flight", {}, {
+						save : {
+							method : 'POST',
+							headers : {
+								'openflightssessionid' : openflightssessionid
+							}
+						}
+					});
+
+					function openflightssessionid(requestConfig) {
+						// this function will be called every time the "get"
+						// action gets called
+						// the result will be used as value for the header item
+						// if it doesn't return a value, the key will not be
+						// present in the header
+						return $rootScope.openflightsSessionId;
+					}
+
 					$scope.save = function() {
-						
+
 						flights.save($scope.flight);
 					}
 					$scope.openCalendar = function(event, what) {
@@ -32,7 +50,7 @@ angular.module('openflightsApp').controller(
 								BACKEND_URL + "/flight-autocomplete/flightNo",
 								$scope.flight).then(function(response) {
 							$scope.flight = response.data;
-							
+
 						}, function() {
 							console.log("error")
 						});
