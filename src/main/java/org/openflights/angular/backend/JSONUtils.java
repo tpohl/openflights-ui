@@ -28,7 +28,7 @@ public class JSONUtils {
 				}
 			} catch (NullPointerException e) {
 				// Nothing.
-				LOG.info("Property {} not found in {}", property, obj, e);
+				LOG.debug("Property {} not found in {}. Trying next one.", property, obj, e);
 			
 			}
 		}
