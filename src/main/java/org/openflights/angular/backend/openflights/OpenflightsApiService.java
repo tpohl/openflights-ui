@@ -82,9 +82,37 @@ public class OpenflightsApiService implements Serializable {
 
 		return al;
 	}
+public String[] getChallengeAndSession(){
+	Client client = ClientBuilder.newClient();
 
+	WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/map.php"));
+
+	Form form = new Form();
+	
+	form.param("user","0");
+	form.param("trid","0");
+	form.param("alid","");
+	form.param("year","");
+	form.param("param","true");
+
+	Response response = target.request(MediaType.APPLICATION_XML)
+			.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+	final String sessionId = response.getCookies().get("PHPSESSID").getValue();
+	final String responseString = (String) response.getEntity();
+	final String firstLine = responseString.substring(0, responseString.indexOf("\n"));
+	LOG.info("Firstline {}", firstLine);
+	final String challenge = firstLine.substring(firstLine.lastIndexOf(";"));
+	LOG.info("Challenge {}, Session ID", challenge, sessionId);
+	return new String[]{challenge, sessionId};
+}
 	public String login(Credentials cred) {
+		
+		this.getChallengeAndSession();
+		
 		Client client = ClientBuilder.newClient();
+		
+		
+		
 		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/submit.php"));
 
 		Form form = new Form();
