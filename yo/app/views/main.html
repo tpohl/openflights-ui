@@ -1,13 +1,23 @@
-<div class="jumbotron">
+<div >
   <h1>Openflights</h1>
   <p class="lead">
     
     Demo
   </p>
+  <div ng-show="openflightsSessionId">
   <p><a class="btn btn-lg btn-success" ng-href="#/addFlight">Add Flight<span class="glyphicon glyphicon-ok"></span></a></p>
   <p><a class="btn btn-lg btn-success" ng-href="#/flightlist">List Flights<span class="glyphicon glyphicon-ok"></span></a></p>
-  
-  <input ng-model="username"></input>
-  <input ng-model="password" type="password"></input>
+  </div>
+  <div class="jumbotron" ng-show="!openflightsSessionId">
+  <h5>Please sign in with your openflights.org credentials</h5>
+  <div class="form-group">
+			<label for="username">Username:</label> 
+  <input id="username" ng-model="username"></input>
+  </div>
+  <div class="form-group">
+  <label for="password">Password:</label> 
+  <input ng-model="password" type="password" id="password"></input>
+  </div>
   <button ng-click="login()">Login</button>
+  </div>
 </div>

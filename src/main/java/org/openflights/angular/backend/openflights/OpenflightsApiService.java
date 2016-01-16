@@ -1,11 +1,14 @@
 package org.openflights.angular.backend.openflights;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -20,6 +23,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.openflights.angular.backend.Calculation;
 import org.openflights.angular.backend.openflights.model.LoginPrerequisites;
 import org.openflights.angular.model.Airline;
@@ -266,7 +272,35 @@ public class OpenflightsApiService implements Serializable {
 		String response = target.request(MediaType.APPLICATION_XML).cookie(OPENFLIGHTS_SESSION_COOKIE, sessionId)
 				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE), String.class);
 		LOG.info("Response of listing Flights {}", response);
-		// TODO convert the tab seperated answer to flights.
-		return null;
+
+		CSVFormat format = CSVFormat.DEFAULT.withDelimiter('\t').withHeader("from", "from_code", "to", "to_code",
+				"flightNo", "date", "distance", "duration", "seat", "reason", "bookingclass", "ka", "ID",
+				"aircraftType", "tailsign", "ka2", "ka3", "Airline", "departureTime", "ka4");
+		try {
+		final CSVParser parser = new CSVParser(new StringReader(response),format);
+		List<Flight> flights = new ArrayList<>();
+		try {
+		    for (final CSVRecord record : parser) {
+		      
+		       final Flight f = new Flight();
+		       f.setFrom(record.get("from"));
+		       f.setTo(record.get("to"));
+		       f.setFlightNo(record.get("flightNo"));
+		       
+		       
+		       flights.add(f);
+		       LOG.info("Parsed flight {}", f);
+		    }
+		    
+		    return flights;
+		} finally {
+		    parser.close();
+		  
+		}
+		} catch (IOException e){
+			LOG.error("Problem parsing flights {}", response, e);
+			return null;
+		}
+		
 	}
 }

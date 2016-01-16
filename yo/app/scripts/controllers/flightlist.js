@@ -14,12 +14,14 @@ angular.module('openflightsApp').controller(
 				'$resource',
 				'$http',
 				function($scope, $rootScope, BACKEND_URL, $resource, $http) {
-					var listFlights = $http.get(BACKEND_URL + "/flight/list", $scope.flight)
+					var listFlights = function(){
+						$http.get(BACKEND_URL + "/flight/list", $scope.flight)
 							.then(function(response) {
 								$scope.flights = response.data;
 
 							}, function() {
 								console.log("error")
 							});
+					};
 					listFlights();
 				} ]);
