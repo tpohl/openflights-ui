@@ -36,6 +36,11 @@ angular
         controller: 'AddflightCtrl',
         controllerAs: 'addFlight'
       })
+      .when('/flightlist', {
+        templateUrl: 'views/flightlist.html',
+        controller: 'FlightlistCtrl',
+        controllerAs: 'flightlist'
+      })
       .otherwise({
         redirectTo: '/'
       });

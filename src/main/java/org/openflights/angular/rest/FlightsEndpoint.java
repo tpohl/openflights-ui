@@ -1,5 +1,7 @@
 package org.openflights.angular.rest;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -32,5 +34,10 @@ public class FlightsEndpoint {
 		f.setFrom("FROM");
 		f.setTo("TO");
 		return f;
+	}
+	@GET
+	@Path("list")
+	public List<Flight> listFlights(@HeaderParam("openflightssessionid") String sessionId){
+		return openflightsApiService.loadAllFlights(sessionId);
 	}
 }

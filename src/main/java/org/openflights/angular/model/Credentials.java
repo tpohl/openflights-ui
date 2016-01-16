@@ -2,9 +2,8 @@ package org.openflights.angular.model;
 
 public class Credentials {
 	private String username;
-	private String passwordHash;
-	private String challenge;
-
+	private String password;
+	
 	public String getUsername() {
 		return username;
 	}
@@ -13,20 +12,14 @@ public class Credentials {
 		this.username = username;
 	}
 
-	public String getPasswordHash() {
-		return passwordHash;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public String getChallenge() {
-		return challenge;
-	}
-
-	public void setChallenge(String challenge) {
-		this.challenge = challenge;
-	}
+	
 
 }

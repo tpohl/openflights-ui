@@ -14,10 +14,8 @@ public class LoginEndpoint {
 	OpenflightsApiService openflightsApiService;
 	@POST
 	public SessionId doLogin(Credentials cred) {
-		System.out.println(cred.getPasswordHash());
 		
 		String sessionId = openflightsApiService.login(cred);
-		System.out.println(sessionId);
 		return new SessionId(sessionId);
 	}
 }
