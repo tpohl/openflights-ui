@@ -9,7 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -43,6 +47,8 @@ public class OpenflightsApiService implements Serializable {
 	@Inject
 	Calculation calculation;
 
+	private Map<String, Airline> airlineCache = new HashMap<>();
+
 	public Airport loadAirport(String searchTerm) {
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/autocomplete.php"));
@@ -72,26 +78,49 @@ public class OpenflightsApiService implements Serializable {
 		return ap;
 	}
 
-	public Airline loadAirline(String airline) {
-		Client client = ClientBuilder.newClient();
-		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/autocomplete.php"));
+	public Airline loadAirline(final String airline) {
+		if (airline == null || airline.length() < 2) {
+			
+			return null;
+		}
+		Airline al = this.airlineCache.get(airline);
+		if (al == null) {
+			LOG.info("loading airline {}", airline);
+			try {
+				Client client = ClientBuilder.newClient();
+				WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/autocomplete.php"));
 
-		Form form = new Form();
-		form.param("airline", airline);
-		form.param("mode", "F");
-		form.param("quick", "true");
+				Form form = new Form();
+				form.param("airline", airline);
+				form.param("mode", "F");
+				form.param("quick", "true");
 
-		String response = target.request(MediaType.APPLICATION_XML)
-				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE), String.class);
+				String response = target.request(MediaType.APPLICATION_XML)
+						.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE), String.class);
 
-		final Airline al = new Airline();
+				al = new Airline();
 
-		int sep1 = response.indexOf(";");
+				int sep1 = response.indexOf(";");
 
-		al.setName(response.substring(sep1 + 1));
+				String fullName = response.substring(sep1 + 1,response.length()-1);
+				Pattern p =Pattern.compile("(.*)\\((..)\\).*?");
+				Matcher m = p.matcher(fullName);
+				if (m.matches()){
+					al.setCode(m.group(2));
+					al.setName(m.group(1));
+					LOG.info("Matched airline name {}", fullName);
+				} else {
+					LOG.info("Not matched airline name {}", fullName);
+					al.setName(fullName);
+				}
+				al.setOpenflightsId(response.substring(0, sep1));
 
-		al.setOpenflightsId(response.substring(0, sep1));
-
+				this.airlineCache.put(airline, al);
+			} catch (Exception e) {
+				LOG.warn("problem loading airline {}", airline, e);
+				return null;
+			}
+		}
 		return al;
 	}
 
@@ -274,33 +303,44 @@ public class OpenflightsApiService implements Serializable {
 		LOG.info("Response of listing Flights {}", response);
 
 		CSVFormat format = CSVFormat.DEFAULT.withDelimiter('\t').withHeader("from", "from_code", "to", "to_code",
-				"flightNo", "date", "distance", "duration", "seat", "reason", "bookingclass", "ka", "ID",
-				"aircraftType", "tailsign", "ka2", "ka3", "Airline", "departureTime", "ka4");
+				"flightNo", "date", "distance", "duration", "seat", "reason", "bookingclass", "ka", "ID", "acType",
+				"acTailsign", "ka2", "note", "tripId", "ka4", "airline", "departureTime", "ka5");
 		try {
-		final CSVParser parser = new CSVParser(new StringReader(response),format);
-		List<Flight> flights = new ArrayList<>();
-		try {
-		    for (final CSVRecord record : parser) {
-		      
-		       final Flight f = new Flight();
-		       f.setFrom(record.get("from"));
-		       f.setTo(record.get("to"));
-		       f.setFlightNo(record.get("flightNo"));
-		       
-		       
-		       flights.add(f);
-		       LOG.info("Parsed flight {}", f);
-		    }
-		    
-		    return flights;
-		} finally {
-		    parser.close();
-		  
-		}
-		} catch (IOException e){
+			final CSVParser parser = new CSVParser(new StringReader(response), format);
+			List<Flight> flights = new ArrayList<>();
+			try {
+				for (final CSVRecord record : parser) {
+//LOG.info("ka4{} airline{} departureTime{} ka5{}",record.get("ka4"),record.get("airline"),record.get("departureTime"),record.get("ka5"));
+					final Flight f = new Flight();
+
+					f.setAcTailsign(record.get("acTailsign"));
+					f.setAcType(record.get("acType"));
+					f.setArrival(null);
+					f.setBookingClass(record.get("bookingclass"));
+					f.setCarrier(this.loadAirline(record.get("airline")));
+					f.setDeparture(null);
+					f.setFlightNo(record.get("flightNo"));
+					f.setFrom(record.get("from"));
+					// f.setAptFrom(this.loadAirport(f.getFrom()));
+					f.setReason(record.get("reason"));
+					f.setSeat(record.get("seat"));
+					f.setSeatType("");
+					f.setTo(record.get("to"));
+					// f.setAptTo(this.loadAirport(f.getTo()));
+
+					flights.add(f);
+					LOG.debug("Parsed flight {}", f);
+				}
+
+				return flights;
+			} finally {
+				parser.close();
+
+			}
+		} catch (IOException e) {
 			LOG.error("Problem parsing flights {}", response, e);
 			return null;
 		}
-		
+
 	}
 }

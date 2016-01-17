@@ -1,6 +1,38 @@
-<p>This is the flightlist view.</p>
+<h1>Flight-List</h1>
 <ul class="list-group">
 <li ng-repeat="flight in flights" class="list-group-item">
-{{flight.flightNo}}
+<div class="row">
+<div class="column col-xs-1">
+{{flight.carrier.code}}
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+{{flight.flightNo}}</div>
+<div class="column col-xs-5 col-sm-4 col-md-3 col-lg-2">
+{{flight.from}}
+<i class="fa fa-angle-right"></i>
+{{flight.to}}
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+date
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+distance
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+dauer
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+{{flight.acType}} {{flight.acTailsign}}
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+{{flight.seat}} {{flight.seatType}}
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+{{flight.bookingclass}}
+</div>
+<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
+{{flight.reason}}</div>
+
+</div>
 </li>
 </ul>

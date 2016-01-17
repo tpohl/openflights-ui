@@ -1,6 +1,8 @@
 package org.openflights.angular.model;
 
 public class Airline {
+	private String code;
+
 	private String name;
 	private String openflightsId;
 
@@ -29,9 +31,17 @@ public class Airline {
 		this.openflightsId = openflightsId;
 	}
 
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 	@Override
 	public String toString() {
-		return "Airline [name=" + name + ", openflightsId=" + openflightsId + "]";
+		return "Airline [code=" + code + ", name=" + name + ", openflightsId=" + openflightsId + "]";
 	}
 
 }
