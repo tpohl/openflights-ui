@@ -1,3 +1,17 @@
+ <script type="text/ng-template" id="addFlightSuccess.html">
+<div  close="ok()">
+    <div class="modal-header">
+        <h4>Add flight</h4>
+    </div>
+    <div class="modal-body">
+        <p>{{message}}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-success" ng-click="ok()">Okay</button>
+    </div>
+  </div>
+</script>
+
 <h2>Add Flight</h2>
 
 <div>
@@ -83,6 +97,7 @@
 		</div>
 		<div class="form-group">
 			<label for="reason">Reason:</label> 
+			<div>
 			<div class="btn-group">
 					<label class="btn btn-primary" ng-model="flight.reason"
 						uib-btn-radio="'B'">Work</label> <label class="btn btn-primary"
@@ -92,9 +107,7 @@
 						class="btn btn-primary" ng-model="flight.reason"
 						uib-btn-radio="'O'">Other</label>
 				</div>
-			
-			<input type="text"
-				class="form-control" id="reason" ng-model="flight.reason">
+			</div>
 		</div>
 		<div class="form-group">
 			<label for="carrier">Carrier:</label> <input type="text"

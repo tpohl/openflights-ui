@@ -13,7 +13,9 @@ angular.module('openflightsApp').controller(
 				'BACKEND_URL',
 				'$resource',
 				'$http',
-				function($scope,$rootScope, BACKEND_URL, $resource, $http) {
+				'$uibModal',
+				function($scope, $rootScope, BACKEND_URL, $resource, $http,
+						$uibModal) {
 					var flights = $resource(BACKEND_URL + "/flight", {}, {
 						save : {
 							method : 'POST',
@@ -32,10 +34,30 @@ angular.module('openflightsApp').controller(
 						return $rootScope.openflightsSessionId;
 					}
 
+					var openDialog = function(saveResult) {
+						var modalInstance = $uibModal.open({
+							animation : true,
+							templateUrl : 'addFlightSuccess.html',
+							controller : 'AddflightModalCtrl',
+							resolve : {
+								saveResult : function() {
+									return saveResult;
+								}
+							}
+						});
+						modalInstance.result.then(function() {
+							$scope.flight = {};
+						});
+
+					}
+
 					$scope.save = function() {
 
-						flights.save($scope.flight);
+						var result = flights.save($scope.flight);
+						openDialog(result);
+
 					}
+
 					$scope.openCalendar = function(event, what) {
 						if ('departure' == what) {
 							$scope.cal_open_departure = true;
@@ -85,3 +107,25 @@ angular.module('openflightsApp').controller(
 				} ]
 
 );
+
+// Controller for the Modal Dialog.
+angular.module('openflightsApp').controller(
+		'AddflightModalCtrl',
+		[ '$scope', '$uibModalInstance', 'saveResult',
+				function($scope, $uibModalInstance, saveResult) {
+			
+			// This does not seam to work.
+					if (saveResult === "true") {
+						$scope.message = "Success";
+					} else {
+						$scope.message = "Failed.";
+					}
+
+					$scope.ok = function() {
+						$uibModalInstance.close();
+					};
+
+					$scope.cancel = function() {
+						$uibModalInstance.dismiss('cancel');
+					};
+				} ]);
