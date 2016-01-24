@@ -1,5 +1,9 @@
 package org.openflights.angular.rest;
 
+import java.text.DecimalFormat;
+import java.time.ZoneId;
+import java.util.Date;
+
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,9 +30,9 @@ public class FlightAutocompleteEndpoint {
 	public Flight autocompleteByFlightNumber(Flight flight) {
 		if (flight.getFlightNo() != null) {
 			try {
-
+// TODO better. Date handling.
 				final FlightStatus lhStatus = lufthansaApiService.getFlightStatus(flight.getFlightNo(),
-						flight.getDeparture());
+						flight.getDeparture()==null?null:Date.from(flight.getDeparture().toInstant()));
 				if (lhStatus.getFrom() != null) {
 					// Only if we found something
 					flight.setDeparture(lhStatus.getDeparture());
@@ -53,6 +57,13 @@ public class FlightAutocompleteEndpoint {
 
 		if (flight.getFrom() != null) {
 			flight.setAptFrom(openflightsApiService.loadAirport(flight.getFrom()));
+			
+			// FIXME remove.
+			DecimalFormat tzFormat = new DecimalFormat("+#0;-#0");
+			
+			String tz = tzFormat.format(flight.getAptFrom().getTimezone());
+			LOG.info("Timzone {} -> {}",flight.getAptFrom().getTimezone(), tz);
+			flight.setDeparture(flight.getDeparture().withZoneSameInstant(ZoneId.of(tz)));
 		}
 		if (flight.getTo() != null) {
 			flight.setAptTo(openflightsApiService.loadAirport(flight.getTo()));

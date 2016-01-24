@@ -1,12 +1,12 @@
 package org.openflights.angular.backend.lufthansa.model;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 public class FlightStatus {
 	private String from;
 	private String to;
-	private Date departure;
-	private Date arrival;
+	private ZonedDateTime departure;
+	private ZonedDateTime arrival;
 	private String airlineCode;
 	private String flightNo;
 	private String aircraftCode;
@@ -22,16 +22,16 @@ public class FlightStatus {
 	public void setTo(String to) {
 		this.to = to;
 	}
-	public Date getDeparture() {
+	public ZonedDateTime getDeparture() {
 		return departure;
 	}
-	public void setDeparture(Date departure) {
+	public void setDeparture(ZonedDateTime departure) {
 		this.departure = departure;
 	}
-	public Date getArrival() {
+	public ZonedDateTime getArrival() {
 		return arrival;
 	}
-	public void setArrival(Date arrival) {
+	public void setArrival(ZonedDateTime arrival) {
 		this.arrival = arrival;
 	}
 	public String getAirlineCode() {

@@ -14,8 +14,9 @@ import org.opensextant.geodesy.Longitude;
 @Stateless
 public class Calculation {
 	public Duration calculateDuration(final Flight flight) {
-		Duration durationWithoutTimezone = Duration.between(flight.getDeparture().toInstant(),
-				flight.getArrival().toInstant());
+		// TODO will be easier with localdatatime.
+		Duration durationWithoutTimezone = Duration.between(flight.getDeparture(),
+				flight.getArrival());
 		double timezoneDifference = (flight.getAptFrom().getTimezone() + 12.0)
 				- (flight.getAptTo().getTimezone() + 12.0);
 		Duration duration = durationWithoutTimezone.plusHours(Math.round(timezoneDifference));

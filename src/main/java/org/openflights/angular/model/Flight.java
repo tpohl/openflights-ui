@@ -1,10 +1,10 @@
 package org.openflights.angular.model;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 public class Flight {
-	private Date departure;
-	private Date arrival;
+	private ZonedDateTime departure;
+	private ZonedDateTime arrival;
 	private String from;
 	private Airport aptFrom;
 	private String to;
@@ -34,19 +34,19 @@ public class Flight {
 	private String acType;
 	private String acTailsign;
 
-	public Date getDeparture() {
+	public ZonedDateTime getDeparture() {
 		return departure;
 	}
 
-	public void setDeparture(Date departure) {
+	public void setDeparture(ZonedDateTime departure) {
 		this.departure = departure;
 	}
 
-	public Date getArrival() {
+	public ZonedDateTime getArrival() {
 		return arrival;
 	}
 
-	public void setArrival(Date arrival) {
+	public void setArrival(ZonedDateTime arrival) {
 		this.arrival = arrival;
 	}
 

@@ -61,11 +61,11 @@ public class LufthansaApiService {
 
 					status.setFrom(getString(flight, "Departure.AirportCode"));
 					status.setDeparture(JSONUtils.extractDate(flight, LH_API_DATEFORMAT,
-							"Departure.ActualTimeLocal.DateTime", "Departure.ScheduledTimeLocal.DateTime"));
+							"Departure.ActualTimeUTC.DateTime", "Departure.ScheduledTimeUTC.DateTime"));
 
 					status.setTo(getString(flight, "Arrival.AirportCode"));
-					status.setArrival(extractDate(flight, LH_API_DATEFORMAT, "Arrival.ActualTimeLocal.DateTime",
-							"Arrival.ScheduledTimeLocal.DateTime"));
+					status.setArrival(extractDate(flight, LH_API_DATEFORMAT, "Arrival.ActualTimeUTC.DateTime",
+							"Arrival.ScheduledTimeUTC.DateTime"));
 					status.setAirlineCode(getString(flight, "OperatingCarrier.AirlineID"));
 					status.setAircraftCode(getString(flight, "Equipment.AircraftCode"));
 					status.setFlightNo(flightNo);

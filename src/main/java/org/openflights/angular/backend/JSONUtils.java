@@ -3,6 +3,8 @@ package org.openflights.angular.backend;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -16,7 +18,8 @@ import org.slf4j.LoggerFactory;
 public class JSONUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(JSONUtils.class);
 
-	public static Date extractDate(final JsonObject obj, final String format, final String... properties)
+	// FIXME this needs a timezone parameter.
+	public static ZonedDateTime extractDate(final JsonObject obj, final String format, final String... properties)
 			throws ParseException {
 		DateFormat jsonDateFormat = new SimpleDateFormat(format);
 
@@ -24,7 +27,11 @@ public class JSONUtils {
 			try {
 				String value = getString(obj, property);
 				if (value != null) {
-					return jsonDateFormat.parse(value);
+					final Date utilDate = jsonDateFormat.parse(value);
+					
+					// FIXME Get proper zoneId!
+					final ZonedDateTime ldt = ZonedDateTime.ofInstant(utilDate.toInstant(), ZoneId.of("Z"));
+					return ldt;
 				}
 			} catch (NullPointerException e) {
 				// Nothing.
