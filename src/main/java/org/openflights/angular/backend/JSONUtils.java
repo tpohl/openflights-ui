@@ -19,7 +19,7 @@ public class JSONUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(JSONUtils.class);
 
 	// FIXME this needs a timezone parameter.
-	public static ZonedDateTime extractDate(final JsonObject obj, final String format, final String... properties)
+	public static Date extractDate(final JsonObject obj, final String format, final String... properties)
 			throws ParseException {
 		DateFormat jsonDateFormat = new SimpleDateFormat(format);
 
@@ -28,10 +28,7 @@ public class JSONUtils {
 				String value = getString(obj, property);
 				if (value != null) {
 					final Date utilDate = jsonDateFormat.parse(value);
-					
-					// FIXME Get proper zoneId!
-					final ZonedDateTime ldt = ZonedDateTime.ofInstant(utilDate.toInstant(), ZoneId.of("Z"));
-					return ldt;
+					return utilDate;
 				}
 			} catch (NullPointerException e) {
 				// Nothing.

@@ -1,13 +1,14 @@
 package org.openflights.angular.rest;
 
-import java.text.DecimalFormat;
-import java.time.ZoneId;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import org.openflights.angular.TimeZoneUtils;
 import org.openflights.angular.backend.lufthansa.LufthansaApiService;
 import org.openflights.angular.backend.lufthansa.model.FlightStatus;
 import org.openflights.angular.backend.openflights.OpenflightsApiService;
@@ -30,15 +31,27 @@ public class FlightAutocompleteEndpoint {
 	public Flight autocompleteByFlightNumber(Flight flight) {
 		if (flight.getFlightNo() != null) {
 			try {
-// TODO better. Date handling.
-				final FlightStatus lhStatus = lufthansaApiService.getFlightStatus(flight.getFlightNo(),
-						flight.getDeparture()==null?null:Date.from(flight.getDeparture().toInstant()));
+				// TODO better. Date handling.
+
+				// Find the date of the flight.
+				final String dateOfFlight;
+				if (flight.getDeparture() != null) {
+					dateOfFlight = flight.getDeparture().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+				} else if (flight.getDepartureLocal() != null) {
+					dateOfFlight = flight.getDepartureLocal().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+				} else {
+					dateOfFlight = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+				}
+
+				final FlightStatus lhStatus = lufthansaApiService.getFlightStatus(flight.getFlightNo(), dateOfFlight);
 				if (lhStatus.getFrom() != null) {
 					// Only if we found something
 					flight.setDeparture(lhStatus.getDeparture());
+					flight.setDepartureLocal(lhStatus.getDepartureLocal());
 					flight.setFrom(lhStatus.getFrom());
 					flight.setTo(lhStatus.getTo());
 					flight.setArrival(lhStatus.getArrival());
+					flight.setArrivalLocal(lhStatus.getArrivalLocal());
 					final Aircraft acInfo = lufthansaApiService.getAircraftInfo(lhStatus.getAircraftCode());
 					flight.setAcType(acInfo.getName());
 				}
@@ -57,18 +70,12 @@ public class FlightAutocompleteEndpoint {
 
 		if (flight.getFrom() != null) {
 			flight.setAptFrom(openflightsApiService.loadAirport(flight.getFrom()));
-			
-			// FIXME remove.
-			DecimalFormat tzFormat = new DecimalFormat("+#0;-#0");
-			
-			String tz = tzFormat.format(flight.getAptFrom().getTimezone());
-			LOG.info("Timzone {} -> {}",flight.getAptFrom().getTimezone(), tz);
-			flight.setDeparture(flight.getDeparture().withZoneSameInstant(ZoneId.of(tz)));
 		}
 		if (flight.getTo() != null) {
 			flight.setAptTo(openflightsApiService.loadAirport(flight.getTo()));
 		}
-		
+
+		TimeZoneUtils.updateTimezones(flight);
 		return flight;
 	}
 }

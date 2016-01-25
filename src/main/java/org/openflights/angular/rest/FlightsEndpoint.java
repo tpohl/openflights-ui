@@ -8,6 +8,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import org.openflights.angular.TimeZoneUtils;
 import org.openflights.angular.backend.openflights.OpenflightsApiService;
 import org.openflights.angular.model.Flight;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class FlightsEndpoint {
 
 	@POST
 	public boolean saveFlight(final Flight flight, @HeaderParam("openflightssessionid") String sessionId) {
-
+		TimeZoneUtils.updateTimezones(flight);
 		LOG.info("Flight to be saved {} with session {}", flight, sessionId);
 		return openflightsApiService.persistFlight(flight,sessionId);
 	}

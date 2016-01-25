@@ -6,6 +6,10 @@ import static org.openflights.angular.backend.JSONUtils.getString;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -18,7 +22,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import org.openflights.angular.backend.JSONUtils;
 import org.openflights.angular.backend.lufthansa.model.FlightStatus;
 import org.openflights.angular.backend.lufthansa.model.LhApiAircraft;
 import org.openflights.angular.backend.lufthansa.model.LhApiAirport;
@@ -38,19 +41,18 @@ public class LufthansaApiService {
 	 * @param flightNo
 	 *            the flight-number you are interested in.
 	 * @param date
-	 *            optional Date of Flight (will default to today).
+	 *            the Date formatted "yyyy-MM-dd". not null.
 	 * @return a FlightStatus which might be empty, if nothing was found found.
 	 */
-	public FlightStatus getFlightStatus(final String flightNo, final Date date) {
+	public FlightStatus getFlightStatus(final String flightNo, final String date) {
 		final FlightStatus status = new FlightStatus();
 		try {
 
-			DateFormat parameterFormat = new SimpleDateFormat("yyyy-MM-dd");
-			String dateParameter = parameterFormat.format(date != null ? date : new Date());
+			
 			Client client = ClientBuilder.newClient();
 			WebTarget target = client.target(
 					UriBuilder.fromPath("https://api.lufthansa.com/v1/operations/flightstatus/{flightNo}/{date}")
-							.build(flightNo, dateParameter));
+							.build(flightNo, date));
 			JsonObject jsonStatus = lhApi.authenticateBuilder(target.request(MediaType.APPLICATION_JSON))
 					.get(JsonObject.class);
 			LOG.info("Flight-Status JSON: {}", jsonStatus);
@@ -60,12 +62,22 @@ public class LufthansaApiService {
 					final JsonObject flight = getObject(jsonStatus, "FlightStatusResource.Flights.Flight");
 
 					status.setFrom(getString(flight, "Departure.AirportCode"));
-					status.setDeparture(JSONUtils.extractDate(flight, LH_API_DATEFORMAT,
-							"Departure.ActualTimeUTC.DateTime", "Departure.ScheduledTimeUTC.DateTime"));
+					
+					Date departureUTC = extractDate(flight, LH_API_DATEFORMAT, "Departure.ActualTimeUTC.DateTime",
+							"Arrival.ScheduledTimeUTC.DateTime");
+					Date departureLocal = extractDate(flight, LH_API_DATEFORMAT, "Departure.ActualTimeLocal.DateTime",
+							"Arrival.ScheduledTimeLocal.DateTime");
+					status.setDeparture(ZonedDateTime.ofInstant(departureUTC.toInstant(), ZoneId.of("Z")));
+					status.setDepartureLocal(LocalDateTime.ofInstant(departureLocal.toInstant(), ZoneId.systemDefault()));
+					
 
 					status.setTo(getString(flight, "Arrival.AirportCode"));
-					status.setArrival(extractDate(flight, LH_API_DATEFORMAT, "Arrival.ActualTimeUTC.DateTime",
-							"Arrival.ScheduledTimeUTC.DateTime"));
+					Date arrivalUTC = extractDate(flight, LH_API_DATEFORMAT, "Arrival.ActualTimeUTC.DateTime",
+							"Arrival.ScheduledTimeUTC.DateTime");
+					Date arrivalLocal = extractDate(flight, LH_API_DATEFORMAT, "Arrival.ActualTimeLocal.DateTime",
+							"Arrival.ScheduledTimeLocal.DateTime");
+					status.setArrival(ZonedDateTime.ofInstant(arrivalUTC.toInstant(), ZoneId.of("Z")));
+					status.setArrivalLocal(LocalDateTime.ofInstant(arrivalLocal.toInstant(), ZoneId.systemDefault()));
 					status.setAirlineCode(getString(flight, "OperatingCarrier.AirlineID"));
 					status.setAircraftCode(getString(flight, "Equipment.AircraftCode"));
 					status.setFlightNo(flightNo);

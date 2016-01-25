@@ -268,7 +268,7 @@ public class OpenflightsApiService implements Serializable {
 		form.param("mode", "F");// mode:F
 
 		// TODO What is this
-		form.param("fid", "0");// fid:4824043
+		form.param("fid", "0");
 		form.param("param", "ADD");// param:ADD
 		LOG.info("Using Session ID {}", sessionId);
 		String response = target.request(MediaType.APPLICATION_XML).cookie(OPENFLIGHTS_SESSION_COOKIE, sessionId)

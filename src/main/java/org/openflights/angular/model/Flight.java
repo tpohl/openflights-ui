@@ -1,30 +1,17 @@
 package org.openflights.angular.model;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public class Flight {
 	private ZonedDateTime departure;
 	private ZonedDateTime arrival;
+	private LocalDateTime departureLocal;
+	private LocalDateTime arrivalLocal;
 	private String from;
 	private Airport aptFrom;
 	private String to;
 	private Airport aptTo;
-	public Airport getAptFrom() {
-		return aptFrom;
-	}
-
-	public void setAptFrom(Airport aptFrom) {
-		this.aptFrom = aptFrom;
-	}
-
-	public Airport getAptTo() {
-		return aptTo;
-	}
-
-	public void setAptTo(Airport aptTo) {
-		this.aptTo = aptTo;
-	}
-
 	private String flightNo;
 	private String seat;
 	private String seatType;
@@ -130,15 +117,45 @@ public class Flight {
 		this.acTailsign = acTailsign;
 	}
 
-	@Override
-	public String toString() {
-		return "Flight [departure=" + departure + ", arrival=" + arrival + ", from=" + from + ", aptFrom=" + aptFrom
-				+ ", to=" + to + ", aptTo=" + aptTo + ", flightNo=" + flightNo + ", seat=" + seat + ", seatType="
-				+ seatType + ", bookingClass=" + bookingClass + ", reason=" + reason + ", carrier=" + carrier
-				+ ", acType=" + acType + ", acTailsign=" + acTailsign + "]";
+	public Airport getAptFrom() {
+		return aptFrom;
 	}
 
-	
-	
-	
+	public void setAptFrom(Airport aptFrom) {
+		this.aptFrom = aptFrom;
+	}
+
+	public Airport getAptTo() {
+		return aptTo;
+	}
+
+	public void setAptTo(Airport aptTo) {
+		this.aptTo = aptTo;
+	}
+
+	public LocalDateTime getDepartureLocal() {
+		return departureLocal;
+	}
+
+	public void setDepartureLocal(LocalDateTime departureLocal) {
+		this.departureLocal = departureLocal;
+	}
+
+	public LocalDateTime getArrivalLocal() {
+		return arrivalLocal;
+	}
+
+	public void setArrivalLocal(LocalDateTime arrivalLocal) {
+		this.arrivalLocal = arrivalLocal;
+	}
+
+	@Override
+	public String toString() {
+		return "Flight [departure=" + departure + ", arrival=" + arrival + ", departureLocal=" + departureLocal
+				+ ", arrivalLocal=" + arrivalLocal + ", from=" + from + ", aptFrom=" + aptFrom + ", to=" + to
+				+ ", aptTo=" + aptTo + ", flightNo=" + flightNo + ", seat=" + seat + ", seatType=" + seatType
+				+ ", bookingClass=" + bookingClass + ", reason=" + reason + ", carrier=" + carrier + ", acType="
+				+ acType + ", acTailsign=" + acTailsign + "]";
+	}
+
 }
