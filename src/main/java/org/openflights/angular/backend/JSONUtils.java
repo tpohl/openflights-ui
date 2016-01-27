@@ -53,7 +53,7 @@ public class JSONUtils {
 				return getStringValue(obj, lastElement);
 			} catch (NullPointerException e) {
 				// Nothing.
-				LOG.info("Property {} not found in {}", lastElement, obj, e);
+				LOG.trace("Property {} not found in {}", lastElement, obj, e);
 				throw e;
 			}
 

@@ -56,6 +56,10 @@ angular.module('openflightsApp').controller(
 						var result = flights.save($scope.flight);
 						openDialog(result);
 
+					};
+					$scope.updateDate = function() {
+						$scope.flight.departure = null;
+						$scope.flight.arrival = null;
 					}
 
 					$scope.openCalendar = function(event, what) {
@@ -79,30 +83,38 @@ angular.module('openflightsApp').controller(
 					};
 					$scope.loadMasterdata = function() {
 						console.log("masterdata()")
-						$http.get(
-								BACKEND_URL + "/masterdata/airport/"
-										+ $scope.flight.from).then(
-								function(response) {
-									$scope.airportFrom = response.data
-								}, function() {
-									console.log("error")
-								});
-						$http.get(
-								BACKEND_URL + "/masterdata/airport/"
-										+ $scope.flight.to).then(
-								function(response) {
-									$scope.airportTo = response.data
-								}, function() {
-									console.log("error")
-								});
-						$http.get(
-								BACKEND_URL + "/masterdata/aircraft/"
-										+ $scope.flight.acType).then(
-								function(response) {
-									$scope.aircraft = response.data
-								}, function() {
-									console.log("error")
-								});
+						if ($scope.flight.from == "") {
+							$scope.flight.aptFrom = null;
+						} else {
+							$http.get(
+									BACKEND_URL + "/masterdata/airport/"
+											+ $scope.flight.from).then(
+									function(response) {
+										$scope.flight.aptFrom = response.data
+									}, function() {
+										console.log("error")
+									});
+						}
+						if ($scope.flight.to == "") {
+							$scope.flight.aptTo = null;
+						} else {
+							$http.get(
+									BACKEND_URL + "/masterdata/airport/"
+											+ $scope.flight.to).then(
+									function(response) {
+										$scope.flight.aptTo = response.data
+									}, function() {
+										console.log("error")
+									});
+						}
+						// $http.get(
+						// BACKEND_URL + "/masterdata/aircraft/"
+						// + $scope.flight.acType).then(
+						// function(response) {
+						// $scope.aircraft = response.data
+						// }, function() {
+						// console.log("error")
+						// });
 					}
 				} ]
 
@@ -113,8 +125,8 @@ angular.module('openflightsApp').controller(
 		'AddflightModalCtrl',
 		[ '$scope', '$uibModalInstance', 'saveResult',
 				function($scope, $uibModalInstance, saveResult) {
-			
-			// This does not seam to work.
+
+					// This does not seam to work.
 					if (saveResult === "true") {
 						$scope.message = "Success";
 					} else {

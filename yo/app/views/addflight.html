@@ -19,7 +19,7 @@
 		<div class="form-group">
 			<label for="flightNo">Flight No:</label>
 			<div class="input-group">
-				<input type="text" class="form-control" id="flightNo"
+				<input type="text" class="form-control" id="flightNo" ng-change="loadMasterdata()"
 					ng-model="flight.flightNo"> <span class="input-group-btn">
 					<button type="button" class="btn btn-default"
 						ng-click="autocomplete('flightNo')">
@@ -31,8 +31,8 @@
 		<div class="form-group">
 			<label for="departure">Departure:</label>
 			<div class="input-group">
-				<input type="text" class="form-control"
-					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.departureLocal"
+				<input type="datetime-local" class="form-control"
+					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.departureLocal" ng-change="updateDate()"
 					is-open="cal_open_departure" /> <span class="input-group-btn">
 					<button type="button" class="btn btn-default"
 						ng-click="openCalendar($event, 'departure')">
@@ -44,8 +44,8 @@
 		<div class="form-group">
 			<label for="arrival">Arrival:</label>
 			<div class="input-group">
-				<input type="text" class="form-control"
-					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.arrivalLocal"
+				<input type="datetime-local" class="form-control"
+					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.arrivalLocal" ng-change="updateDate()"
 					is-open="cal_open_arrival" /> <span class="input-group-btn">
 					<button type="button" class="btn btn-default"
 						ng-click="openCalendar($event, 'arrival')">
@@ -56,13 +56,13 @@
 
 		</div>
 		<div class="form-group">
-			<label for="from">From:</label> <input type="text"
+			<label for="from">From:</label> <input type="text" ng-change="loadMasterdata()"
 				class="form-control" id="from" ng-model="flight.from">
-			{{flight.aptFrom.name}} - {{flight.aptFrom.openflightsId}}
+			{{flight.aptFrom.name}}
 		</div>
 		<div class="form-group">
-			<label for="to">To:</label> <input type="text" class="form-control"
-				id="to" ng-model="flight.to"> {{flight.aptTo.name}} - {{flight.aptTo.openflightsId}}
+			<label for="to">To:</label> <input type="text" class="form-control" ng-change="loadMasterdata()"
+				id="to" ng-model="flight.to"> {{flight.aptTo.name}}
 		</div>
 
 		<div class="form-group">
@@ -111,12 +111,11 @@
 		</div>
 		<div class="form-group">
 			<label for="carrier">Carrier:</label> <input type="text"
-				class="form-control" id="carrier" ng-model="flight.carrier.name">{{flight.carrier.openflightsId}}
+				class="form-control" id="carrier" ng-model="flight.carrier.name">
 		</div>
 		<div class="form-group">
 			<label for="acType">Aircraft Type:</label> <input type="text"
 				class="form-control" id="acType" ng-model="flight.acType">
-			{{aircraft.name}}
 		</div>
 		<div class="form-group">
 			<label for="acTailsign">Aircract Tailsign:</label> <input type="text"

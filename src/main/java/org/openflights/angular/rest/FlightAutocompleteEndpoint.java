@@ -62,7 +62,6 @@ public class FlightAutocompleteEndpoint {
 
 		if (flight.getFlightNo() != null) {
 			String airlineId = flight.getFlightNo().substring(0, 2);
-			System.out.println("AL=" + airlineId);
 			Airline airline = openflightsApiService.loadAirline(airlineId);
 
 			flight.setCarrier(airline);

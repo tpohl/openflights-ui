@@ -64,9 +64,9 @@ public class LufthansaApiService {
 					status.setFrom(getString(flight, "Departure.AirportCode"));
 					
 					Date departureUTC = extractDate(flight, LH_API_DATEFORMAT, "Departure.ActualTimeUTC.DateTime",
-							"Arrival.ScheduledTimeUTC.DateTime");
+							"Departure.ScheduledTimeUTC.DateTime");
 					Date departureLocal = extractDate(flight, LH_API_DATEFORMAT, "Departure.ActualTimeLocal.DateTime",
-							"Arrival.ScheduledTimeLocal.DateTime");
+							"Departure.ScheduledTimeLocal.DateTime");
 					status.setDeparture(ZonedDateTime.ofInstant(departureUTC.toInstant(), ZoneId.of("Z")));
 					status.setDepartureLocal(LocalDateTime.ofInstant(departureLocal.toInstant(), ZoneId.systemDefault()));
 					
