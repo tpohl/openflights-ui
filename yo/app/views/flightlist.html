@@ -20,7 +20,10 @@
 				{{flight.bookingclass}}</div>
 			<div class="column col-xs-3 col-sm-3 col-md-2 col-lg-1">
 				{{flight.reason}}</div>
-			<div class="column col-xs-1">{{flight.id}}</div>
+			<div class="column col-xs-1">
+			<a class="btn btn-sm btn-success"
+			ng-href="#/editFlight/{{flight.id}}">Edit</a>
+			</div>
 		</div>
 	</li>
 </ul>

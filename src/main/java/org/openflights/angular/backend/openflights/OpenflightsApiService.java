@@ -44,8 +44,27 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Named
 public class OpenflightsApiService implements Serializable {
+	private static final String CSV_HEADER_DEPARTURE_TIME = "departureTime";
+	private static final String CSV_HEADER_AIRLINE = "airline";
+	private static final String CSV_HEADER_TRIP_ID = "tripId";
+	private static final String CSV_HEADER_NOTE = "note";
+	private static final String CSV_HEADER_AC_TAILSIGN = "acTailsign";
+	private static final String CSV_HEADER_AC_TYPE = "acType";
+	private static final String CSV_HEADER_ID = "ID";
+	private static final String CSV_HEADER_BOOKINGCLASS = "bookingclass";
+	private static final String CSV_HEADER_REASON = "reason";
+	private static final String CSV_HEADER_SEAT = "seat";
+	private static final String CSV_HEADER_DURATION = "duration";
+	private static final String CSV_HEADER_DISTANCE = "distance";
+	private static final String CSV_HEADER_DEPARTURE_DATE = "date";
+	private static final String CSV_HEADER_FLIGHT_NO = "flightNo";
+	private static final String CSV_HEADER_TO_CODE = "to_code";
+	private static final String CSV_HEADER_TO = "to";
+	private static final String CSV_HEADER_FROM_CODE = "from_code";
+	private static final String CSV_HEADER_FROM = "from";
 	private static final String OPENFLIGHTS_SESSION_COOKIE = "PHPSESSID";
 	private static final Logger LOG = LoggerFactory.getLogger(OpenflightsApiService.class);
+	private static final String CSV_HEADER_SEATTYPE = "seattype";
 	@Inject
 	Calculation calculation;
 
@@ -94,7 +113,7 @@ public class OpenflightsApiService implements Serializable {
 				WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/autocomplete.php"));
 
 				Form form = new Form();
-				form.param("airline", airline);
+				form.param(CSV_HEADER_AIRLINE, airline);
 				form.param("mode", "F");
 				form.param("quick", "true");
 
@@ -254,18 +273,18 @@ public class OpenflightsApiService implements Serializable {
 		form.param("dst_apid", flight.getAptTo().getOpenflightsId());// dst_apid:1382
 		// Stats
 		String duration = Calculation.formatDuration(calculation.calculateDuration(flight));
-		form.param("duration", duration);// duration:01:24
+		form.param(CSV_HEADER_DURATION, duration);// duration:01:24
 
 		double distance = calculation.calculateDistance(flight);
-		form.param("distance", String.valueOf(Math.round(distance)));// distance:452
+		form.param(CSV_HEADER_DISTANCE, String.valueOf(Math.round(distance)));// distance:452
 		// Flight Data
 		form.param("number", flight.getFlightNo());// number:4U7406
-		form.param("seat", flight.getSeat());// seat:12A
+		form.param(CSV_HEADER_SEAT, flight.getSeat());// seat:12A
 		form.param("type", flight.getSeatType());// type:W
 		form.param("class", flight.getBookingClass());// class:Y
-		form.param("reason", flight.getReason());// reason:B
+		form.param(CSV_HEADER_REASON, flight.getReason());// reason:B
 		form.param("registration", flight.getAcTailsign());// registration:REG
-		form.param("note", "");// note:
+		form.param(CSV_HEADER_NOTE, "");// note:
 		form.param("plane", flight.getAcType());// plane:Airbus A320
 		form.param("trid", "NULL");// trid:NULL
 		form.param("mode", "F");// mode:F
@@ -337,9 +356,11 @@ public class OpenflightsApiService implements Serializable {
 		 * 
 		 */
 
-		CSVFormat format = CSVFormat.DEFAULT.withDelimiter('\t').withHeader("from", "from_code", "to", "to_code",
-				"flightNo", "date", "distance", "duration", "seat", "reason", "bookingclass", "ka", "ID", "acType",
-				"acTailsign", "ka2", "note", "tripId", "ka4", "airline", "departureTime", "ka5");
+		CSVFormat format = CSVFormat.DEFAULT.withDelimiter('\t').withHeader(CSV_HEADER_FROM, CSV_HEADER_FROM_CODE,
+				CSV_HEADER_TO, CSV_HEADER_TO_CODE, CSV_HEADER_FLIGHT_NO, CSV_HEADER_DEPARTURE_DATE, CSV_HEADER_DISTANCE,
+				CSV_HEADER_DURATION, CSV_HEADER_SEAT, CSV_HEADER_REASON, CSV_HEADER_BOOKINGCLASS, "ka", CSV_HEADER_ID,
+				CSV_HEADER_AC_TYPE, CSV_HEADER_AC_TAILSIGN, "ka2", CSV_HEADER_NOTE, CSV_HEADER_TRIP_ID, "ka4",
+				CSV_HEADER_AIRLINE, CSV_HEADER_DEPARTURE_TIME, "ka5");
 		try {
 			final CSVParser parser = new CSVParser(new StringReader(response), format);
 			List<Flight> flights = new ArrayList<>();
@@ -350,22 +371,23 @@ public class OpenflightsApiService implements Serializable {
 					// ka5{}",record.get("ka4"),record.get("airline"),record.get("departureTime"),record.get("ka5"));
 					final Flight f = new Flight();
 
-					f.setId(record.get("ID"));
-					f.setAcTailsign(record.get("acTailsign"));
-					f.setAcType(record.get("acType"));
+					f.setId(record.get(CSV_HEADER_ID));
+					f.setAcTailsign(record.get(CSV_HEADER_AC_TAILSIGN));
+					f.setAcType(record.get(CSV_HEADER_AC_TYPE));
 					f.setArrival(null); // How can we get this.
-					f.setBookingClass(record.get("bookingclass"));
-					f.setCarrier(this.loadAirline(record.get("airline")));
+					f.setBookingClass(record.get(CSV_HEADER_BOOKINGCLASS));
+					f.setCarrier(this.loadAirline(record.get(CSV_HEADER_AIRLINE)));
 
-					f.setDepartureLocal(parseDate(record.get("date"), record.get("departureTime")));
+					f.setDepartureLocal(
+							parseDate(record.get(CSV_HEADER_DEPARTURE_DATE), record.get(CSV_HEADER_DEPARTURE_TIME)));
 
-					f.setFlightNo(record.get("flightNo"));
-					f.setFrom(record.get("from"));
+					f.setFlightNo(record.get(CSV_HEADER_FLIGHT_NO));
+					f.setFrom(record.get(CSV_HEADER_FROM));
 					// f.setAptFrom(this.loadAirport(f.getFrom()));
-					f.setReason(record.get("reason"));
-					f.setSeat(record.get("seat"));
+					f.setReason(record.get(CSV_HEADER_REASON));
+					f.setSeat(record.get(CSV_HEADER_SEAT));
 					f.setSeatType("");
-					f.setTo(record.get("to"));
+					f.setTo(record.get(CSV_HEADER_TO));
 					// f.setAptTo(this.loadAirport(f.getTo()));
 
 					TimeZoneUtils.updateTimezones(f);
@@ -385,10 +407,10 @@ public class OpenflightsApiService implements Serializable {
 
 	}
 
-	public Flight loadFlight(String flightId, String sessionId){
+	public Flight loadFlight(String flightId, String sessionId) {
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(UriBuilder.fromPath("http://openflights.org/php/flights.php"));
-
+		LOG.info("Loading Flight with id {}", flightId);
 		Form form = new Form();
 		form.param("user", "0");
 		form.param("trid", "0");
@@ -401,14 +423,59 @@ public class OpenflightsApiService implements Serializable {
 		String response = target.request(MediaType.APPLICATION_XML).cookie(OPENFLIGHTS_SESSION_COOKIE, sessionId)
 				.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE), String.class);
 		LOG.info("Response of getting Flight {}", response);
+		CSVFormat format = CSVFormat.DEFAULT.withDelimiter('\t').withHeader(CSV_HEADER_FROM, CSV_HEADER_FROM_CODE,
+				CSV_HEADER_TO, CSV_HEADER_TO_CODE, CSV_HEADER_FLIGHT_NO, CSV_HEADER_DEPARTURE_DATE, CSV_HEADER_DISTANCE,
+				CSV_HEADER_DURATION, CSV_HEADER_SEAT, CSV_HEADER_SEATTYPE, CSV_HEADER_BOOKINGCLASS, CSV_HEADER_REASON,
+				CSV_HEADER_ID, CSV_HEADER_AC_TYPE, CSV_HEADER_AC_TAILSIGN, "airlineId", "e1", "e2", "5",
+				CSV_HEADER_AIRLINE, CSV_HEADER_DEPARTURE_TIME, "mode");
+		try {
+			final CSVParser parser = new CSVParser(new StringReader(response), format);
+			CSVRecord record = parser.iterator().next();
+			// FRA 340 HAM 342 LH024 2015-11-20 256 01:01 29A W Y B 4687364
+			// Airbus
+			// A321 D-AISO 3320 5 LH 17:00:00 F
+			Flight f = parseFlight(record);
 
-		// FRA	340	HAM	342	LH024	2015-11-20	256	01:01	29A	W	Y	B	4687364	Airbus A321	D-AISO	3320			5	LH	17:00:00	F
+			TimeZoneUtils.updateTimezones(f);
+			parser.close();
+			return f;
+		} catch (Exception e) {
+			LOG.error("Could not parse Flight {}", response, e);
+			return null;
+		}
+	}
+
+	protected Flight parseFlight(CSVRecord record) {
 		Flight f = new Flight();
-		f.setFlightNo("XX1234");
-		// TODO implement Parsing.
+		f.setId(record.get(CSV_HEADER_ID));
+		f.setAcTailsign(record.get(CSV_HEADER_AC_TAILSIGN));
+		f.setAcType(record.get(CSV_HEADER_AC_TYPE));
+		f.setArrival(null); // How can we get this.
+		f.setBookingClass(record.get(CSV_HEADER_BOOKINGCLASS));
+		f.setCarrier(this.loadAirline(record.get(CSV_HEADER_AIRLINE)));
+
+		f.setDepartureLocal(parseDate(record.get(CSV_HEADER_DEPARTURE_DATE), record.get(CSV_HEADER_DEPARTURE_TIME)));
+
+		f.setFlightNo(record.get(CSV_HEADER_FLIGHT_NO));
+		f.setFrom(record.get(CSV_HEADER_FROM));
+		// f.setAptFrom(this.loadAirport(f.getFrom()));
+		f.setReason(record.get(CSV_HEADER_REASON));
+		f.setSeat(record.get(CSV_HEADER_SEAT));
+		f.setSeatType("");
+		f.setTo(record.get(CSV_HEADER_TO));
+		// f.setAptTo(this.loadAirport(f.getTo()));
 		return f;
 	}
-	
+
+	/**
+	 * Parses the local date from the openflights api.
+	 * 
+	 * @param date
+	 *            the date formatted dd.MM.yyyy
+	 * @param time
+	 *            the time formatted hh:mm:ss
+	 * @return a {@link LocalDateTime} or null.
+	 */
 	private LocalDateTime parseDate(String date, String time) {
 		try {
 			Integer day = Integer.valueOf(date.substring(0, 4));
@@ -423,10 +490,10 @@ public class OpenflightsApiService implements Serializable {
 			}
 			return LocalDateTime.of(day, month, year, hour, minute);
 		} catch (Exception e) {
-			LOG.trace("Problem parsing Date {} {}", date, time, e);
+			LOG.info("Problem parsing Date {} {}", date, time, e);
 			return null;
 		}
 
 	}
-	
+
 }

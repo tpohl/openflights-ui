@@ -37,6 +37,11 @@ angular
         controller: 'AddflightCtrl',
         controllerAs: 'addFlight'
       })
+      .when('/editFlight/:flightId', {
+        templateUrl: 'views/addflight.html',
+        controller: 'AddflightCtrl',
+        controllerAs: 'addFlight'
+      })
       .when('/flightlist', {
         templateUrl: 'views/flightlist.html',
         controller: 'FlightlistCtrl',

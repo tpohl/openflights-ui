@@ -11,11 +11,22 @@ angular.module('openflightsApp').controller(
 				'$scope',
 				'$rootScope',
 				'BACKEND_URL',
+				'$routeParams',
 				'$resource',
 				'$http',
 				'$uibModal',
-				function($scope, $rootScope, BACKEND_URL, $resource, $http,
+				function($scope, $rootScope, BACKEND_URL,$routeParams, $resource, $http,
 						$uibModal) {
+					if ($routeParams.flightId){
+						$http.get(
+								BACKEND_URL + "/flight/"
+										+ $routeParams.flightId).then(
+								function(response) {
+									$scope.flight = response.data
+								}, function() {
+									console.log("error")
+								});
+					}
 					var flights = $resource(BACKEND_URL + "/flight", {}, {
 						save : {
 							method : 'POST',

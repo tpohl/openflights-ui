@@ -31,7 +31,7 @@
 		<div class="form-group">
 			<label for="departure">Departure:</label>
 			<div class="input-group">
-				<input type="datetime-local" class="form-control"
+				<input type="text" class="form-control"
 					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.departureLocal" ng-change="updateDate()"
 					is-open="cal_open_departure" /> <span class="input-group-btn">
 					<button type="button" class="btn btn-default"
@@ -44,7 +44,7 @@
 		<div class="form-group">
 			<label for="arrival">Arrival:</label>
 			<div class="input-group">
-				<input type="datetime-local" class="form-control"
+				<input type="text" class="form-control"
 					datetime-picker="MM/dd/yyyy HH:mm" ng-model="flight.arrivalLocal" ng-change="updateDate()"
 					is-open="cal_open_arrival" /> <span class="input-group-btn">
 					<button type="button" class="btn btn-default"
