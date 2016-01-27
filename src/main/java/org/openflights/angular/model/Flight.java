@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public class Flight {
+	private String id;
 	private ZonedDateTime departure;
 	private ZonedDateTime arrival;
 	private LocalDateTime departureLocal;
@@ -156,6 +157,14 @@ public class Flight {
 				+ ", aptTo=" + aptTo + ", flightNo=" + flightNo + ", seat=" + seat + ", seatType=" + seatType
 				+ ", bookingClass=" + bookingClass + ", reason=" + reason + ", carrier=" + carrier + ", acType="
 				+ acType + ", acTailsign=" + acTailsign + "]";
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 }

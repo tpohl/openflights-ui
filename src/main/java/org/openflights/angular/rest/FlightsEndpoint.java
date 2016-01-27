@@ -3,6 +3,7 @@ package org.openflights.angular.rest;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.websocket.server.PathParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -46,10 +47,9 @@ public class FlightsEndpoint {
 	}
 
 	@GET
-	public Flight getExample() {
-		Flight f = new Flight();
-		f.setFrom("FROM");
-		f.setTo("TO");
+	@Path("{flightId}")
+	public Flight getFlight(@PathParam("flightId")  String flightId,  @HeaderParam("openflightssessionid") String sessionId) {
+		Flight f = openflightsApiService.loadFlight(flightId, sessionId);
 		return f;
 	}
 	@GET
